@@ -4,6 +4,7 @@ import urequests
 from machine import Pin, I2C
 import sh1106
 from secrets import WIFI_SSID, WIFI_PASSWORD, WEATHER_API_KEY
+from oled_display import init_display
 
 CITY = "Munich"
 
@@ -30,12 +31,6 @@ def init_wifi(ssid, password):
         network_info = wlan.ifconfig()
         return True
 
-def init_display():
-    i2c = I2C(0, scl=Pin(5), sda=Pin(4), freq=400000)
-    display = sh1106.SH1106_I2C(128, 64, i2c, res=None, addr=0x3c, rotate=180)
-    display.sleep(False)
-    display.fill(0)
-    return display
 
 def get_weather():
     url = f"http://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={WEATHER_API_KEY}&units=metric"
@@ -62,7 +57,7 @@ def get_weather():
 
 if init_wifi(WIFI_SSID, WIFI_PASSWORD):
     # Initialize the display
-    display = init_display()
+    display = init_display(rotate=180)
     try:
         weather = get_weather()
         display.text_multiline(weather, 0, 0, 1)
