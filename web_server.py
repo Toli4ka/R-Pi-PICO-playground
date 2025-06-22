@@ -4,6 +4,7 @@ from time import sleep
 from machine import Pin, I2C
 from secrets import WIFI_SSID, WIFI_PASSWORD
 import sh1106
+from oled_display import init_display
 
 led = Pin('LED', Pin.OUT)
 
@@ -30,13 +31,6 @@ def init_wifi(ssid, password):
         network_info = wlan.ifconfig()
         print('IP address:', network_info[0])
         return True
-
-def init_display():
-    i2c = I2C(0, scl=Pin(5), sda=Pin(4), freq=400000)
-    display = sh1106.SH1106_I2C(128, 64, i2c, res=None, addr=0x3c, rotate=180)
-    display.sleep(False)
-    display.fill(0)
-    return display
 
 # HTML template for the webpage
 def webpage(message, state):
@@ -69,7 +63,7 @@ def webpage(message, state):
     return str(html)
 
 init_wifi(WIFI_SSID, WIFI_PASSWORD)
-oled = init_display()
+oled = init_display(rotate=180)
 
 # Set up socket and start listening
 addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
